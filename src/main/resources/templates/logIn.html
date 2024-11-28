@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+  <title>Log In</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+    }
+    .error-message,
+    .logout-message {
+      color: #d9534f;
+      margin-bottom: 20px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    input[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+    }
+    .register-button {
+      margin-top: 15px;
+      display: inline-block;
+      padding: 8px 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .register-button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h1>Вход</h1>
+  <div th:if="${param.error}" class="error-message">
+    Неверное имя пользователя или пароль.
+  </div>
+  <div th:if="${param.logout}" class="logout-message">
+    Вы вышли из системы.
+  </div>
+  <form th:action="@{/login}" method="post">
+    <div>
+      <label>Имя пользователя:</label>
+      <input type="text" name="username" required/>
+    </div>
+    <div>
+      <label>Пароль:</label>
+      <input type="password" name="password" required/>
+    </div>
+    <div>
+      <input type="submit" value="Войти"/>
+    </div>
+  </form>
+  <a href="/register" class="register-button">Регистрация</a>
+</div>
+
+</body>
+</html>
