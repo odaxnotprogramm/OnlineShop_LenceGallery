@@ -10,7 +10,6 @@ import java.util.Set;
 @Service
 public interface OrderService {
 
-    Order createOrder(Set<Product> products, User user);
+    Order createOrder(Set<Product> products, User user, String deliveryAddress, String deliveryTime);
 
-    Order saveOrder(Order order);
 }

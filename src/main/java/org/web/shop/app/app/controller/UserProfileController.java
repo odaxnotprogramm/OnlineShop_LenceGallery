@@ -15,6 +15,7 @@ import org.web.shop.app.app.repository.ProductRepository;
 import org.web.shop.app.app.repository.UserRepository;
 import org.web.shop.app.app.service.OrderService;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -146,54 +147,31 @@ public class UserProfileController {
     }
 
     @PostMapping("/buy")
-    public String buy(@AuthenticationPrincipal User currentUser, Model model) {
-        Set<Product> cartProducts = currentUser.getCart();
-        Order order = orderService.createOrder(cartProducts, currentUser);
+    public String buyItems(@AuthenticationPrincipal UserDetails principal,
+                           @RequestParam String address,
+                           @RequestParam String deliveryTime) {
+        User currentUser = userRepository.findByUsername(principal.getUsername());
 
-        model.addAttribute("order", order);
+        Set<Product> cartItems = currentUser.getCart();
 
-        return "order";
-    }
+        Order order = orderService.createOrder(cartItems, currentUser, address, deliveryTime);
 
-    @GetMapping("/checkOrder")
-    public String confirmOrderPage(@ModelAttribute("order") Order order, Model model) {
-        if (order == null) {
-            return "redirect:/error";
-        }
-
-        model.addAttribute("cart", order.getProducts());
-        model.addAttribute("totalPrice", calculateTotalPrice(order.getProducts()));
-        return "order";
-    }
-
-    @PostMapping("/confirmOrder")
-    public String confirmOrder(@RequestParam("address") String address,
-                               @RequestParam("deliveryTime") String deliveryTime,
-                               @ModelAttribute("order") Order order,
-                               @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername());
-
-        if (order != null && user != null) {
-            order.setDeliveryAddress(address);
-            order.setDeliveryTime(deliveryTime);
-            user.addToOrders(order);
-            userRepository.save(user);
-        }
+        currentUser.clearCart();
+        userRepository.save(currentUser);
 
         return "redirect:/profile/orders";
     }
 
     @GetMapping("/orders")
-    public String viewOrders(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        User user = userRepository.findByUsername(userDetails.getUsername());
+    public String viewOrders(@AuthenticationPrincipal UserDetails principal, Model model) {
+        User currentUser = userRepository.findByUsername(principal.getUsername());
 
-        if (user == null) {
-            return "redirect:/error";
-        }
+        List<Order> orders = orderRepository.findByUser(currentUser);
+        model.addAttribute("orders", orders);
 
-        model.addAttribute("orders", user.getOrders());
         return "user-orders";
     }
+
 
     private double calculateTotalPrice(Set<Product> cart) {
         return cart.stream().mapToDouble(Product::getPrice).sum();
