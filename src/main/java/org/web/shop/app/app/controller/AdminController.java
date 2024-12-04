@@ -9,9 +9,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.web.shop.app.app.model.Product;
+import org.web.shop.app.app.model.User;
 import org.web.shop.app.app.service.CategoryService;
 import org.web.shop.app.app.service.ProductService;
 import org.web.shop.app.app.service.SupplierService;
+import org.web.shop.app.app.service.impl.UserService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,11 +28,32 @@ public class AdminController {
     private final ProductService productService;
     private final SupplierService supplierService;
     private final CategoryService categoryService;
+    private final UserService userService;
 
-    public AdminController(ProductService productService, SupplierService supplierService, CategoryService categoryService) {
+    public AdminController(ProductService productService, SupplierService supplierService, CategoryService categoryService, UserService userService) {
         this.productService = productService;
         this.supplierService = supplierService;
         this.categoryService = categoryService;
+        this.userService = userService;
+    }
+
+    @GetMapping("/users")
+    public String getUsers(Model model) {
+        List<User> users = userService.findAllUsers();
+        model.addAttribute("users", users);
+        return "admin-user-list";
+    }
+
+    @PostMapping("/users/{id}/makeAdmin")
+    public String makeAdmin(@PathVariable Integer id) {
+        userService.changeUserRole(id, "ADMIN");
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{id}/makeUser")
+    public String makeUser(@PathVariable Integer id) {
+        userService.changeUserRole(id, "USER");
+        return "redirect:/admin/users";
     }
 
     @GetMapping

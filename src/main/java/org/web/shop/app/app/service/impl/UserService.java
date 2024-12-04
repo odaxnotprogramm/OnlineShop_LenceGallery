@@ -13,6 +13,8 @@ import org.web.shop.app.app.repository.ImageRepository;
 import org.web.shop.app.app.repository.UserRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -55,6 +57,29 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException(username);
+        }
+
+        if (!user.isActive()) {
+            throw new UsernameNotFoundException("User is not active");
+        }
+
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
+    }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public void changeUserRole(Integer id, String role) {
+        Optional<User> user = userRepository.findById(Long.valueOf(id));
+        User existingUser = user.get();
+        if(!existingUser.getRoles().contains(Role.valueOf(role))) {
+            existingUser.getRoles().add(Role.valueOf(role));
+        }
+        userRepository.save(existingUser);
     }
 }

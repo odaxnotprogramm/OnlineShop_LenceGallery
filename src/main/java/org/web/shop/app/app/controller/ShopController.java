@@ -10,6 +10,7 @@ import org.web.shop.app.app.model.Product;
 import org.web.shop.app.app.repository.ProductRepository;
 import org.web.shop.app.app.service.ProductService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
